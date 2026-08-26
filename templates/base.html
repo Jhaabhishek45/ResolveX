@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="ResolveX - Smart Campus Issue Resolution System"
+    >
+
+    <title>{% block title %}ResolveX{% endblock %}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container nav-container">
+
+            <a href="{{ url_for('home') }}" class="brand">
+                <span class="brand-mark">R</span>
+
+                <span class="brand-copy">
+                    <span class="brand-name">ResolveX</span>
+                    <span class="brand-tagline">Campus Operations</span>
+                </span>
+            </a>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="{{ url_for('home') }}">Home</a>
+                {% if current_user.get('role') == 'reporter' %}
+                    <a href="{{ url_for('report_issue') }}">Report issue</a>
+                    <a href="{{ url_for('my_issues') }}">My issues</a>
+                {% elif current_user.get('role') == 'technician' %}
+                    <a href="{{ url_for('staff_queue') }}">Work queue</a>
+                {% elif current_user.get('role') == 'admin' %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('issues') }}">All issues</a>
+                {% else %}
+                    <a href="{{ url_for('home') }}#how-it-works">How it works</a>
+                    <a href="{{ url_for('home') }}#categories">Issues</a>
+                {% endif %}
+            </nav>
+
+            <div class="nav-actions">
+                {% if current_user.get('user_id') %}
+                    <span class="nav-user">{{ current_user.get('name') }}</span>
+                    <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn btn-secondary btn-small" type="submit">Sign out</button></form>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-small">Sign in</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash-message flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-container">
+
+            <div>
+                <div class="footer-brand">ResolveX</div>
+                <p>
+                    A structured platform for reporting,
+                    tracking, and resolving campus issues.
+                </p>
+            </div>
+
+            <div class="footer-meta">
+                <span>SRMIST Ramapuram</span>
+                <span>Python · Flask · SQLite</span>
+            </div>
+
+        </div>
+    </footer>
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
+
+</body>
+</html>

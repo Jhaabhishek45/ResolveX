@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Work Queue — ResolveX{% endblock %}
+
+{% block content %}
+<section class="operations-page">
+    <div class="container operations-container">
+        <div class="operations-header">
+            <div>
+                <span class="section-kicker">TECHNICIAN WORKSPACE</span>
+                <h1>Work queue</h1>
+                <p>Assigned issues for {{ technician.name }}. High-priority work is surfaced first.</p>
+            </div>
+            <a class="btn btn-secondary" href="{{ url_for('home') }}">Return home</a>
+        </div>
+
+        <div class="metric-grid">
+            <div class="metric-card metric-blue"><span>Active work</span><strong>{{ metrics.active }}</strong><small>Assigned to you</small></div>
+            <div class="metric-card metric-red"><span>High priority</span><strong>{{ metrics.high_priority }}</strong><small>Needs careful review</small></div>
+            <div class="metric-card metric-orange"><span>Overdue</span><strong>{{ metrics.overdue }}</strong><small>Past target time</small></div>
+            <div class="metric-card metric-cyan"><span>In progress</span><strong>{{ metrics.in_progress }}</strong><small>Currently being worked</small></div>
+        </div>
+
+        <div class="staff-queue-list">
+            {% for issue in issues %}
+                <article class="operations-panel staff-queue-item">
+                    <div class="staff-queue-summary">
+                        <span class="section-kicker">RX-{{ "%04d"|format(issue.id) }} · {{ issue.category_name }}</span>
+                        <h2><a href="{{ url_for('issue_created', issue_id=issue.id) }}">{{ issue.title }}</a></h2>
+                        <p>{{ issue.building }}{% if issue.room %} · {{ issue.room }}{% endif %} · {{ issue.department_name or 'Unassigned team' }}</p>
+                    </div>
+                    <div class="staff-queue-meta">
+                        <span class="priority-badge priority-{{ issue.priority|lower }}">{{ issue.priority }}</span>
+                        <span class="issue-status status-{{ issue.status|lower }}">{{ issue.status|replace('_', ' ') }}</span>
+                        {% if issue.status == 'ASSIGNED' %}
+                            <form method="post" action="{{ url_for('update_issue_status', issue_id=issue.id) }}" class="queue-action-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="IN_PROGRESS">
+                                <button class="btn btn-primary btn-small" type="submit">Start work</button>
+                            </form>
+                        {% elif issue.status == 'IN_PROGRESS' %}
+                            <form method="post" action="{{ url_for('update_issue_status', issue_id=issue.id) }}" class="queue-action-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="RESOLVED">
+                                <input name="note" required maxlength="500" placeholder="Add resolution note" aria-label="Resolution note for RX-{{ '%04d'|format(issue.id) }}">
+                                <button class="btn btn-primary btn-small" type="submit">Mark resolved</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </article>
+            {% else %}
+                <article class="operations-panel empty-panel">No active issues are assigned to this technician yet.</article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

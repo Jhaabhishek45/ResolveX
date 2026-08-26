@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Operations Dashboard — ResolveX{% endblock %}
+
+{% block content %}
+<section class="operations-page">
+	<div class="container operations-container">
+		<div class="operations-header">
+			<div>
+				<span class="section-kicker">CAMPUS OPERATIONS</span>
+				<h1>Command center</h1>
+				<p>See what needs attention across the campus and how teams are responding.</p>
+			</div>
+			<a class="btn btn-primary" href="{{ url_for('issues') }}">View all issues <span class="btn-arrow">→</span></a>
+		</div>
+
+		<div class="metric-grid">
+			{% for label, key, tone in [
+				('Open issues', 'open', 'blue'),
+				('High priority', 'high_priority', 'red'),
+				('Overdue', 'overdue', 'orange'),
+				('Unassigned', 'unassigned', 'orange'),
+				('In progress', 'in_progress', 'cyan'),
+				('Resolved', 'resolved_period', 'green'),
+				('MTTR', 'mttr_hours', 'blue')
+			] %}
+				<div class="metric-card metric-{{ tone }}">
+					<span>{{ label }}</span>
+					<strong>{% if key == 'mttr_hours' %}{{ resolution_metrics[key] }}h{% else %}{{ metrics[key] }}{% endif %}</strong>
+					<small>{% if key == 'resolved_period' %}Last 30 days{% elif key == 'mttr_hours' %}Mean time to resolve{% else %}Live from issue records{% endif %}</small>
+				</div>
+			{% endfor %}
+		</div>
+
+		<div class="operations-grid">
+			<article class="operations-panel attention-panel">
+				<div class="panel-heading"><div><span class="section-kicker">PRIORITY SIGNALS</span><h2>Needs attention</h2></div><span class="panel-count">{{ attention|length }}</span></div>
+				{% if attention %}
+					{% for item in attention %}<div class="attention-item"><span class="attention-marker"></span><span>{{ item.text }}</span><a href="{{ url_for('issues') }}{% if item.query %}?{{ item.query }}{% endif %}">Review</a></div>{% endfor %}
+				{% else %}<div class="empty-panel">No urgent operational signals right now.</div>{% endif %}
+			</article>
+
+			<article class="operations-panel">
+				<div class="panel-heading"><div><span class="section-kicker">WORKLOAD</span><h2>Team queue</h2></div></div>
+				{% if workloads %}
+					{% for row in workloads %}<div class="workload-row"><span>{{ row.name }}</span><strong>{{ row.issue_count }}</strong></div>{% endfor %}
+				{% else %}<div class="empty-panel">No active assignments yet.</div>{% endif %}
+			</article>
+		</div>
+
+		<article class="operations-panel category-panel">
+			<div class="panel-heading"><div><span class="section-kicker">ISSUE MIX</span><h2>Issues by category</h2></div></div>
+			{% if categories %}<div class="category-bars">{% for row in categories %}<div class="category-bar-row"><span>{{ row.name }}</span><div><i style="width: {{ (row.issue_count / categories[0].issue_count * 100)|round|int }}%"></i></div><strong>{{ row.issue_count }}</strong></div>{% endfor %}</div>{% else %}<div class="empty-panel">Issue distribution will appear after reports are submitted.</div>{% endif %}
+		</article>
+
+		<div class="operations-grid analytics-lower-grid">
+			<article class="operations-panel">
+				<div class="panel-heading"><div><span class="section-kicker">CAMPUS PATTERNS</span><h2>Issues by building</h2></div></div>
+				{% if buildings %}{% for row in buildings %}<div class="workload-row"><span>{{ row.name }}</span><strong>{{ row.issue_count }}</strong></div>{% endfor %}{% else %}<div class="empty-panel">No building data yet.</div>{% endif %}
+			</article>
+			<article class="operations-panel">
+				<div class="panel-heading"><div><span class="section-kicker">REPEAT SIGNALS</span><h2>Recurring issues</h2></div></div>
+				{% if recurring %}{% for row in recurring %}<div class="workload-row"><span>{{ row.name }} · {{ row.category_name }}</span><strong>{{ row.issue_count }}</strong></div>{% endfor %}{% else %}<div class="empty-panel">No recurring issue pattern detected.</div>{% endif %}
+			</article>
+		</div>
+
+		<article class="operations-panel category-panel">
+			<div class="panel-heading"><div><span class="section-kicker">FOURTEEN-DAY TREND</span><h2>New vs resolved</h2></div></div>
+			{% if trend %}<div class="trend-list">{% for row in trend %}<div class="trend-row"><span>{{ row.day }}</span><span class="trend-new">New {{ row.new_count }}</span><span class="trend-resolved">Resolved {{ row.resolved_count }}</span></div>{% endfor %}</div>{% else %}<div class="empty-panel">Trend data will appear as issues are reported and resolved.</div>{% endif %}
+		</article>
+
+		<div class="analytics-rates"><span>Resolution rate <strong>{{ resolution_metrics.resolution_rate }}%</strong></span><span>Overdue rate <strong>{{ resolution_metrics.overdue_rate }}%</strong></span><span>Critical open <strong>{{ metrics.critical }}</strong></span><span>Reopened <strong>{{ metrics.reopened }}</strong></span></div>
+	</div>
+</section>
+{% endblock %}

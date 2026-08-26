@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}
+RX-{{ "%04d"|format(issue.id) }} — ResolveX
+{% endblock %}
+
+{% block content %}
+
+<section class="issue-detail-page">
+
+    <div class="container issue-detail-container">
+
+        <!-- Breadcrumb -->
+
+        <div class="issue-breadcrumb">
+            <a href="{{ url_for('home') }}">ResolveX</a>
+            <span>/</span>
+            <span>Issue RX-{{ "%04d"|format(issue.id) }}</span>
+        </div>
+
+
+        <!-- Header -->
+
+        <div class="issue-detail-header">
+
+            <div>
+
+                <div class="issue-id-label">
+                    ISSUE RX-{{ "%04d"|format(issue.id) }}
+                </div>
+
+                <h1>
+                    {{ issue.title }}
+                </h1>
+
+                <p class="issue-location-line">
+                    {{ issue.building }}
+
+                    {% if issue.floor %}
+                        · {{ issue.floor }}
+                    {% endif %}
+
+                    {% if issue.room %}
+                        · {{ issue.room }}
+                    {% endif %}
+                </p>
+
+            </div>
+
+
+            <div class="issue-header-status">
+
+                <span
+                    class="issue-status
+                    status-{{ issue.status|lower }}"
+                >
+                    {{ issue.status|replace("_", " ") }}
+                </span>
+
+                <span
+                    class="priority-badge
+                    priority-{{ issue.priority|lower }}"
+                >
+                    {{ issue.priority }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Main content -->
+
+        <div class="issue-layout">
+
+            <!-- LEFT -->
+
+            <div class="issue-main-column">
+
+                <!-- Lifecycle -->
+
+                <article class="detail-card">
+
+                    <div class="detail-card-heading">
+
+                        <div>
+                            <span class="detail-kicker">
+                                ISSUE LIFECYCLE
+                            </span>
+
+                            <h2>
+                                Resolution progress
+                            </h2>
+                        </div>
+
+                        <span class="lifecycle-caption">
+                            {{ issue.status|replace("_", " ") }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="lifecycle">
+
+                        {% set steps = [
+                            ("REPORTED", "Issue received"),
+                            ("TRIAGED", "Issue reviewed"),
+                            ("ASSIGNED", "Team assigned"),
+                            ("IN_PROGRESS", "Work started"),
+                            ("RESOLVED", "Marked resolved"),
+                            ("VERIFIED", "Resolution verified"),
+                            ("CLOSED", "Issue closed")
+                        ] %}
+
+                        {% set status_order = {
+                            "REPORTED": 1,
+                            "TRIAGED": 2,
+                            "ASSIGNED": 3,
+                            "IN_PROGRESS": 4,
+                            "RESOLVED": 5,
+                            "VERIFIED": 6,
+                            "CLOSED": 7
+                        } %}
+
+                        {% for step_name, step_description in steps %}
+
+                            <div
+                                class="lifecycle-step
+                                {% if status_order.get(issue.status, 0)
+                                    >= status_order.get(step_name, 0) %}
+                                    completed
+                                {% endif %}"
+                            >
+
+                                <div class="lifecycle-marker">
+                                    {% if status_order.get(issue.status, 0)
+                                        >= status_order.get(step_name, 0) %}
+                                        ✓
+                                    {% else %}
+                                        {{ loop.index }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="lifecycle-content">
+
+                                    <strong>
+                                        {{ step_name|replace("_", " ") }}
+                                    </strong>
+
+                                    <span>
+                                        {{ step_description }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </article>
+
+
+                <!-- Description -->
+
+                <article class="detail-card">
+
+                    <div class="detail-card-heading">
+
+                        <div>
+                            <span class="detail-kicker">
+                                REPORT
+                            </span>
+
+                            <h2>
+                                What was reported
+                            </h2>
+                        </div>
+
+                    </div>
+
+
+                    <div class="issue-description">
+                        {{ issue.description }}
+                    </div>
+
+                </article>
+
+
+                <!-- Activity -->
+
+                <article class="detail-card">
+
+                    <div class="detail-card-heading">
+
+                        <div>
+                            <span class="detail-kicker">
+                                ACTIVITY
+                            </span>
+
+                            <h2>
+                                Issue history
+                            </h2>
+                        </div>
+
+                    </div>
+
+
+                    {% if history %}
+
+                        <div class="activity-timeline">
+
+                            {% for event in history %}
+
+                                <div class="activity-event">
+
+                                    <div class="activity-dot"></div>
+
+                                    <div class="activity-body">
+
+                                        <div class="activity-top">
+
+                                            <strong>
+                                                {{
+                                                    event.action
+                                                    |replace("_", " ")
+                                                    |title
+                                                }}
+                                            </strong>
+
+                                            <time>
+                                                {{ event.timestamp }}
+                                            </time>
+
+                                        </div>
+
+                                        {% if event.note %}
+
+                                            <p>
+                                                {{ event.note }}
+                                            </p>
+
+                                        {% endif %}
+
+                                        {% if event.user_name %}
+
+                                            <span class="activity-user">
+                                                {{ event.user_name }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="empty-history">
+                            No activity recorded yet.
+                        </div>
+
+                    {% endif %}
+
+                </article>
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <aside class="issue-side-column">
+
+                <!-- Triage result -->
+
+                <article class="detail-card triage-card">
+
+                    <span class="detail-kicker">
+                        RESOLVEX TRIAGE
+                    </span>
+
+                    <h2>
+                        Routing decision
+                    </h2>
+
+                    <div class="triage-row">
+                        <span>Category</span>
+                        <strong>
+                            {{ issue.category_name }}
+                        </strong>
+                    </div>
+
+                    {% if issue.subcategory_name %}
+
+                        <div class="triage-row">
+                            <span>Issue type</span>
+                            <strong>
+                                {{ issue.subcategory_name }}
+                            </strong>
+                        </div>
+
+                    {% endif %}
+
+                    <div class="triage-row">
+                        <span>Priority</span>
+
+                        <strong
+                            class="priority-text
+                            priority-text-{{ issue.priority|lower }}"
+                        >
+                            {{ issue.priority }}
+                        </strong>
+                    </div>
+
+                    <div class="triage-row">
+                        <span>Assigned team</span>
+
+                        <strong>
+                            {{ issue.department_name
+                               or "Awaiting assignment" }}
+                        </strong>
+                    </div>
+
+                    {% if issue.due_at %}
+
+                        <div class="triage-row">
+                            <span>Target resolution</span>
+
+                            <strong>
+                                {{ issue.due_at }}
+                            </strong>
+                        </div>
+
+                    {% endif %}
+
+                    <div class="triage-footer">
+                        <span class="triage-check">✓</span>
+
+                        <span>
+                            Rule-based triage applied
+                        </span>
+                    </div>
+
+                </article>
+
+                {% if current_user.get('role') == 'admin' %}
+                    <article class="detail-card admin-assignment-card">
+                        <span class="detail-kicker">ADMIN OPERATIONS</span>
+                        <h2>Ownership</h2>
+                        <div class="triage-row"><span>Current team</span><strong>{{ issue.department_name or 'Unassigned' }}</strong></div>
+                        <div class="triage-row"><span>Current owner</span><strong>{{ issue.assignee_name or 'Unassigned' }}</strong></div>
+                        {% if issue.status not in ['RESOLVED', 'VERIFIED', 'CLOSED'] %}
+                            <form method="post" action="{{ url_for('assign_issue', issue_id=issue.id) }}" class="detail-assignment-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <select name="department_id" required aria-label="Assign department"><option value="">Choose department</option>{% for department in departments %}<option value="{{ department.id }}" {% if issue.department_id == department.id %}selected{% endif %}>{{ department.name }}</option>{% endfor %}</select>
+                                <select name="technician_id" required aria-label="Assign technician"><option value="">Choose technician</option>{% for technician in technicians %}<option value="{{ technician.id }}">{{ technician.name }}</option>{% endfor %}</select>
+                                <button class="btn btn-primary btn-small" type="submit">Assign owner</button>
+                            </form>
+                        {% endif %}
+                    </article>
+                {% endif %}
+
+                {% if issue.status in ["RESOLVED", "VERIFIED"] %}
+                    <article class="detail-card verification-card">
+                        <span class="detail-kicker">REPORTER REVIEW</span>
+                        <h2>Was this issue resolved?</h2>
+                        <p>Confirm the fix or reopen the issue so the support team can continue working.</p>
+                        <div class="verification-actions">
+                            {% if issue.status == "RESOLVED" %}
+                                <form method="post" action="{{ url_for('verify_issue', issue_id=issue.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="action" value="confirm"><button class="btn btn-primary" type="submit">Confirm resolution</button></form>
+                            {% else %}
+                                <form method="post" action="{{ url_for('verify_issue', issue_id=issue.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="action" value="close"><button class="btn btn-primary" type="submit">Close issue</button></form>
+                            {% endif %}
+                            <form method="post" action="{{ url_for('verify_issue', issue_id=issue.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="action" value="reopen"><button class="btn btn-secondary" type="submit">Still not fixed</button></form>
+                        </div>
+                    </article>
+                {% endif %}
+
+
+                <!-- Location -->
+
+                <article class="detail-card">
+
+                    <span class="detail-kicker">
+                        LOCATION
+                    </span>
+
+                    <h2>
+                        Where it was reported
+                    </h2>
+
+                    <div class="location-display">
+
+                        <div class="location-symbol">
+                            LOC
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                {{ issue.building }}
+                            </strong>
+
+                            <span>
+
+                                {% if issue.floor %}
+                                    {{ issue.floor }}
+                                {% endif %}
+
+                                {% if issue.room %}
+                                    · {{ issue.room }}
+                                {% endif %}
+
+                                {% if issue.facility_type %}
+                                    · {{ issue.facility_type }}
+                                {% endif %}
+
+                            </span>
+
+                            {% if issue.specific_area %}
+                                <div class="specific-area-display">
+                                    <span>Specific area</span>
+                                    <strong>{{ issue.specific_area }}</strong>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Issue information -->
+
+                <article class="detail-card">
+
+                    <span class="detail-kicker">
+                        ISSUE INFORMATION
+                    </span>
+
+                    <div class="info-list">
+
+                        <div>
+                            <span>Issue ID</span>
+                            <strong>
+                                RX-{{ "%04d"|format(issue.id) }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Reported</span>
+                            <strong>
+                                {{ issue.created_at }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Current status</span>
+                            <strong>
+                                {{ issue.status
+                                   |replace("_", " ") }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="btn btn-primary issue-back-button"
+                >
+                    Return to ResolveX
+                </a>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

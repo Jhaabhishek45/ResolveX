@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+
+{% block title %}
+ResolveX — Smart Campus Issue Resolution
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="container hero-grid">
+
+        <div class="hero-copy">
+
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                Smart campus operations
+            </div>
+
+            <h1>
+                Report campus problems.
+                <span>Track every resolution.</span>
+            </h1>
+
+            <p class="hero-description">
+                ResolveX gives students and staff a simple way to
+                report campus issues while giving support teams
+                the tools to triage, assign, track, and resolve them.
+            </p>
+
+            <div class="hero-actions" id="report">
+
+                <a
+                    href="{{ url_for('report_issue') }}"
+                    class="btn btn-primary"
+                >
+                    Report an issue
+                    <span class="btn-arrow">→</span>
+                </a>
+
+                <a
+                    href="#"
+                    class="btn btn-secondary"
+                >
+                    Track an issue
+                </a>
+
+            </div>
+
+            <div class="hero-note">
+                <span class="status-dot status-dot-green"></span>
+                Built for structured campus issue resolution
+            </div>
+
+        </div>
+
+
+        <div class="product-preview">
+
+            <div class="preview-header">
+
+                <div>
+                    <span class="preview-label">
+                        ResolveX
+                    </span>
+
+                    <h3>
+                        Operations overview
+                    </h3>
+                </div>
+
+                <span class="preview-badge">
+                    PRODUCT PREVIEW
+                </span>
+
+            </div>
+
+
+            <div class="preview-kpis">
+
+                <div class="preview-kpi">
+                    <span>Issue management</span>
+                    <strong>Live-ready</strong>
+                    <small>SQLite powered</small>
+                </div>
+
+                <div class="preview-kpi">
+                    <span>Priority</span>
+                    <strong>Rule-based</strong>
+                    <small>Smart triage engine</small>
+                </div>
+
+                <div class="preview-kpi">
+                    <span>Resolution</span>
+                    <strong>Tracked</strong>
+                    <small>Full issue lifecycle</small>
+                </div>
+
+            </div>
+
+
+            <div class="preview-section">
+
+                <div class="preview-section-header">
+
+                    <span>
+                        Example operational alerts
+                    </span>
+
+                    <span class="preview-link">
+                        ResolveX
+                    </span>
+
+                </div>
+
+
+                <div class="preview-item">
+
+                    <div
+                        class="issue-symbol issue-network"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div class="preview-item-main">
+
+                        <strong>
+                            Wi-Fi issue
+                        </strong>
+
+                        <span>
+                            Location-based triage
+                        </span>
+
+                    </div>
+
+                    <span class="priority-chip priority-high">
+                        HIGH
+                    </span>
+
+                </div>
+
+
+                <div class="preview-item">
+
+                    <div
+                        class="issue-symbol issue-facility"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div class="preview-item-main">
+
+                        <strong>
+                            Projector issue
+                        </strong>
+
+                        <span>
+                            Routed to support team
+                        </span>
+
+                    </div>
+
+                    <span class="priority-chip priority-medium">
+                        MEDIUM
+                    </span>
+
+                </div>
+
+
+                <div class="preview-item">
+
+                    <div
+                        class="issue-symbol issue-water"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div class="preview-item-main">
+
+                        <strong>
+                            Water leakage
+                        </strong>
+
+                        <span>
+                            Maintenance workflow
+                        </span>
+
+                    </div>
+
+                    <span class="priority-chip priority-low">
+                        LOW
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="preview-footer">
+
+                <span>
+                    Designed around real campus workflows
+                </span>
+
+                <span
+                    class="preview-pulse"
+                    aria-hidden="true"
+                ></span>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<section class="trust-strip">
+
+    <div class="container trust-grid">
+
+        <div class="trust-item">
+            <strong>Report</strong>
+            <span>Simple issue intake</span>
+        </div>
+
+        <div class="trust-separator"></div>
+
+        <div class="trust-item">
+            <strong>Triage</strong>
+            <span>Structured routing</span>
+        </div>
+
+        <div class="trust-separator"></div>
+
+        <div class="trust-item">
+            <strong>Track</strong>
+            <span>Transparent progress</span>
+        </div>
+
+        <div class="trust-separator"></div>
+
+        <div class="trust-item">
+            <strong>Resolve</strong>
+            <span>Accountable closure</span>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="section"
+    id="how-it-works"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    HOW IT WORKS
+                </span>
+
+                <h2>
+                    From problem to resolution,
+                    without the confusion.
+                </h2>
+
+            </div>
+
+            <p>
+                ResolveX turns an unstructured campus problem
+                into a trackable operational workflow.
+            </p>
+
+        </div>
+
+
+        <div class="workflow-grid">
+
+            <article class="workflow-card">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="workflow-icon">
+                    01
+                </div>
+
+                <h3>
+                    Report
+                </h3>
+
+                <p>
+                    Select the issue type, location, and impact,
+                    then describe what happened.
+                </p>
+
+            </article>
+
+
+            <article class="workflow-card">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="workflow-icon">
+                    02
+                </div>
+
+                <h3>
+                    Triage
+                </h3>
+
+                <p>
+                    ResolveX uses structured rules to suggest
+                    category, priority, and responsible team.
+                </p>
+
+            </article>
+
+
+            <article class="workflow-card">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="workflow-icon">
+                    03
+                </div>
+
+                <h3>
+                    Assign
+                </h3>
+
+                <p>
+                    The issue moves into the appropriate
+                    support team's work queue.
+                </p>
+
+            </article>
+
+
+            <article class="workflow-card">
+
+                <div class="step-number">
+                    04
+                </div>
+
+                <div class="workflow-icon">
+                    04
+                </div>
+
+                <h3>
+                    Resolve
+                </h3>
+
+                <p>
+                    Progress, work notes, verification, and
+                    closure are preserved as a complete history.
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="section section-muted"
+    id="categories"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    ISSUE TYPES
+                </span>
+
+                <h2>
+                    Built around real campus problems.
+                </h2>
+
+            </div>
+
+            <p>
+                Start broad, then narrow the report to the exact
+                facility or service that needs attention.
+            </p>
+
+        </div>
+
+
+        <div class="category-grid">
+
+            <article class="category-card">
+
+                <div class="category-icon category-blue">
+                    CL
+                </div>
+
+                <div>
+
+                    <h3>
+                        Classroom & Academic
+                    </h3>
+
+                    <p>
+                        Projectors, AC, fans, lighting,
+                        boards, furniture and more.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="category-card">
+
+                <div class="category-icon category-cyan">
+                    IT
+                </div>
+
+                <div>
+
+                    <h3>
+                        IT & Network
+                    </h3>
+
+                    <p>
+                        Wi-Fi, internet, computers,
+                        printers and smart-class systems.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="category-card">
+
+                <div class="category-icon category-orange">
+                    EL
+                </div>
+
+                <div>
+
+                    <h3>
+                        Electrical & Power
+                    </h3>
+
+                    <p>
+                        Power failures, sockets,
+                        switches and lighting problems.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="category-card">
+
+                <div class="category-icon category-teal">
+                    WS
+                </div>
+
+                <div>
+
+                    <h3>
+                        Water & Sanitation
+                    </h3>
+
+                    <p>
+                        Water supply, leakage, washrooms,
+                        drainage and cleanliness.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="category-card">
+
+                <div class="category-icon category-purple">
+                    FM
+                </div>
+
+                <div>
+
+                    <h3>
+                        Facilities & Maintenance
+                    </h3>
+
+                    <p>
+                        Building, furniture, lifts,
+                        common areas and maintenance.
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <article class="category-card">
+
+                <div class="category-icon category-green">
+                    SG
+                </div>
+
+                <div>
+
+                    <h3>
+                        Safety & Security
+                    </h3>
+
+                    <p>
+                        Campus safety, access,
+                        lighting and security-related issues.
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <div class="container insight-banner">
+
+        <div>
+
+            <span class="section-kicker">
+                DESIGNED FOR ACTION
+            </span>
+
+            <h2>
+                Data should tell campus teams
+                what to fix next.
+            </h2>
+
+            <p>
+                ResolveX is designed to turn issue history into
+                operational insight — recurring locations,
+                overdue work, team workload, and resolution trends.
+            </p>
+
+        </div>
+
+
+        <div class="insight-list">
+
+            <div class="insight-item">
+
+                <span
+                    class="insight-marker"
+                    aria-hidden="true"
+                ></span>
+
+                <div>
+
+                    <strong>
+                        Recurring problems
+                    </strong>
+
+                    <span>
+                        Find locations where the same issue
+                        keeps appearing.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-item">
+
+                <span
+                    class="insight-marker"
+                    aria-hidden="true"
+                ></span>
+
+                <div>
+
+                    <strong>
+                        Needs attention
+                    </strong>
+
+                    <span>
+                        Surface unassigned and overdue
+                        high-impact issues.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="insight-item">
+
+                <span
+                    class="insight-marker"
+                    aria-hidden="true"
+                ></span>
+
+                <div>
+
+                    <strong>
+                        Real metrics
+                    </strong>
+
+                    <span>
+                        Dashboard values will come from
+                        the actual issue database.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="cta-section">
+
+    <div class="container cta-card">
+
+        <div>
+
+            <span class="section-kicker section-kicker-light">
+                RESOLVEX
+            </span>
+
+            <h2>
+                A better way to get campus
+                problems resolved.
+            </h2>
+
+            <p>
+                Report clearly. Route intelligently.
+                Resolve transparently.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('report_issue') }}"
+            class="btn btn-light"
+        >
+            Report an issue
+            <span class="btn-arrow">→</span>
+        </a>
+
+    </div>
+
+</section>
+
+{% endblock %}

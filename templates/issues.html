@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}All Issues — ResolveX{% endblock %}
+
+{% block content %}
+<section class="operations-page">
+	<div class="container operations-container">
+		<div class="operations-header">
+			<div><span class="section-kicker">ISSUE REGISTER</span><h1>All issues</h1><p>Search, scan, and open any campus issue from one operational queue.</p></div>
+			<a class="btn btn-primary" href="{{ url_for('report_issue') }}">Report an issue <span class="btn-arrow">→</span></a>
+		</div>
+		<nav class="issue-quick-views" aria-label="Issue quick views">
+			<a href="{{ url_for('issues', high_priority=1) }}">High / critical <span>Priority view</span></a>
+			<a href="{{ url_for('issues', overdue=1) }}">Overdue <span>Needs action</span></a>
+			<a href="{{ url_for('issues') }}">All records <span>Reset view</span></a>
+		</nav>
+
+		<form class="issue-filters" method="get">
+			<input name="search" value="{{ filters.search }}" placeholder="Search title or description" aria-label="Search issues">
+			<select name="status" aria-label="Filter by status"><option value="">Any status</option>{% for value in ['REPORTED','TRIAGED','ASSIGNED','IN_PROGRESS','RESOLVED','VERIFIED','CLOSED','REOPENED'] %}<option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ value|replace('_', ' ')|title }}</option>{% endfor %}</select>
+			<select name="priority" aria-label="Filter by priority"><option value="">Any priority</option>{% for value in ['LOW','MEDIUM','HIGH','CRITICAL'] %}<option value="{{ value }}" {% if filters.priority == value %}selected{% endif %}>{{ value|title }}</option>{% endfor %}</select>
+			<select name="category_id" aria-label="Filter by category"><option value="">Any category</option>{% for category in categories %}<option value="{{ category.id }}" {% if filters.category_id == category.id|string %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select>
+			<select name="department_id" aria-label="Filter by department"><option value="">Any department</option>{% for department in departments %}<option value="{{ department.id }}" {% if filters.department_id == department.id|string %}selected{% endif %}>{{ department.name }}</option>{% endfor %}</select>
+			<select name="technician_id" aria-label="Filter by technician"><option value="">Any technician</option>{% for technician in technicians %}<option value="{{ technician.id }}" {% if filters.technician_id == technician.id|string %}selected{% endif %}>{{ technician.name }}</option>{% endfor %}</select>
+			<select name="building" aria-label="Filter by building"><option value="">Any building</option>{% for building in buildings %}<option value="{{ building.building }}" {% if filters.building == building.building %}selected{% endif %}>{{ building.building }}</option>{% endfor %}</select>
+			<input type="date" name="from_date" value="{{ filters.from_date }}" aria-label="Created from date">
+			<input type="date" name="to_date" value="{{ filters.to_date }}" aria-label="Created to date">
+			<label class="filter-toggle"><input type="checkbox" name="high_priority" value="1" {% if filters.high_priority %}checked{% endif %}> High / critical</label>
+			<label class="filter-toggle"><input type="checkbox" name="overdue" value="1" {% if filters.overdue %}checked{% endif %}> Overdue</label>
+			<button class="btn btn-primary" type="submit">Filter</button>
+		</form>
+
+		<div class="issue-table-wrap">
+			<table class="issue-table"><thead><tr><th>Issue</th><th>Category</th><th>Priority</th><th>Status</th><th>Owner</th><th>Reported</th><th>Assignment</th></tr></thead><tbody>
+			{% for issue in issues %}<tr><td><a class="issue-table-title" href="{{ url_for('issue_created', issue_id=issue.id) }}">RX-{{ "%04d"|format(issue.id) }} · {{ issue.title }}</a><small>{{ issue.building }}{% if issue.room %} · {{ issue.room }}{% endif %}</small></td><td>{{ issue.category_name }}</td><td><span class="priority-badge priority-{{ issue.priority|lower }}">{{ issue.priority }}</span></td><td><span class="issue-status status-{{ issue.status|lower }}">{{ issue.status|replace('_', ' ') }}</span></td><td>{{ issue.assignee_name or 'Unassigned' }}</td><td>{{ issue.created_at }}</td><td>{% if issue.status not in ['RESOLVED', 'VERIFIED', 'CLOSED'] %}<form method="post" action="{{ url_for('assign_issue', issue_id=issue.id) }}" class="assignment-form"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><select name="department_id" required aria-label="Assign department for RX-{{ '%04d'|format(issue.id) }}"><option value="">Department</option>{% for department in departments %}<option value="{{ department.id }}">{{ department.name }}</option>{% endfor %}</select><select name="technician_id" required aria-label="Assign technician for RX-{{ '%04d'|format(issue.id) }}"><option value="">Technician</option>{% for technician in technicians %}<option value="{{ technician.id }}">{{ technician.name }}</option>{% endfor %}</select><button class="btn btn-primary btn-small" type="submit">Assign</button></form>{% else %}<span class="assignment-complete">Work complete</span>{% endif %}</td></tr>{% else %}<tr><td class="table-empty" colspan="7">No issues match these filters.</td></tr>{% endfor %}
+			</tbody></table>
+		</div>
+	</div>
+</section>
+{% endblock %}

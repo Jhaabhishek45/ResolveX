@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}Report an Issue — ResolveX{% endblock %}
+
+{% block content %}
+
+<section class="report-page">
+
+    <div class="container report-container">
+
+        <div class="report-header">
+
+            <div>
+                <span class="section-kicker">REPORT AN ISSUE</span>
+
+                <h1>
+                    Tell us what needs attention.
+                </h1>
+
+                <p>
+                    Give us a few details and ResolveX will help
+                    route your issue to the right campus support team.
+                </p>
+            </div>
+
+            <div class="report-progress">
+                <span class="active">01</span>
+                <span></span>
+                <span>02</span>
+                <span></span>
+                <span>03</span>
+            </div>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('report_issue') }}"
+            class="report-form"
+            id="reportForm"
+        >
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <!-- CATEGORY -->
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <div>
+                        <span class="form-step">STEP 01</span>
+                        <h2>What kind of issue is it?</h2>
+                    </div>
+
+                    <span class="required-note">
+                        Required
+                    </span>
+                </div>
+
+
+                <div class="choice-grid">
+
+                    {% for category in categories %}
+
+                    <label class="choice-card">
+
+                        <input
+                            type="radio"
+                            name="category_id"
+                            value="{{ category.id }}"
+                            data-category="{{ category.name }}"
+                            required
+                        >
+
+                        <div class="choice-card-content">
+
+                            <span class="choice-icon">
+                                {% if "IT" in category.name %}
+                                    IT
+                                {% elif "Electrical" in category.name %}
+                                    EL
+                                {% elif "Water" in category.name %}
+                                    WS
+                                {% elif "Library" in category.name %}
+                                    LB
+                                {% elif "Sports" in category.name %}
+                                    SP
+                                {% elif "Safety" in category.name %}
+                                    SF
+                                {% elif "Facilities" in category.name %}
+                                    FM
+                                {% else %}
+                                    CL
+                                {% endif %}
+                            </span>
+
+                            <span class="choice-text">
+                                <strong>
+                                    {{ category.name }}
+                                </strong>
+
+                                <small>
+                                    {{ category.description }}
+                                </small>
+                            </span>
+
+                        </div>
+
+                    </label>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+            <!-- SUBCATEGORY -->
+
+            <section
+                class="form-section hidden-section"
+                id="subcategorySection"
+            >
+
+                <div class="form-section-heading">
+
+                    <div>
+                        <span class="form-step">STEP 02</span>
+                        <h2>What exactly is affected?</h2>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="subcategory-grid"
+                    id="subcategoryGrid"
+                >
+
+                    {% for subcategory in subcategories %}
+
+                    <label
+                        class="subcategory-option"
+                        data-category-id="{{ subcategory.category_id }}"
+                    >
+
+                        <input
+                            type="radio"
+                            name="subcategory_id"
+                            value="{{ subcategory.id }}"
+                        >
+
+                        <span>
+                            {{ subcategory.name }}
+                        </span>
+
+                    </label>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+            <!-- LOCATION -->
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div>
+                        <span class="form-step">STEP 03</span>
+                        <h2>Where is the issue?</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="location-grid">
+
+                    <div class="field-group">
+
+                        <label for="location_id">
+                            Campus location
+                        </label>
+
+                        <select
+                            id="location_id"
+                            name="location_id"
+                            required
+                        >
+
+                            <option value="">
+                                Select building or facility
+                            </option>
+
+                            {% for location in locations %}
+
+                            <option value="{{ location.id }}">
+                                {{ location.building }}
+                                {% if location.facility_type %}
+                                    — {{ location.facility_type }}
+                                {% endif %}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="field-group">
+
+                        <label for="specific_area">
+                            Specific area <span>Optional</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="specific_area"
+                            name="specific_area"
+                            maxlength="100"
+                            placeholder="Example: Lab 3, Room 204, 2nd Floor"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- IMPACT -->
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div>
+                        <span class="form-step">STEP 04</span>
+                        <h2>How much does this affect you?</h2>
+
+                        <p>
+                            ResolveX uses this information to
+                            suggest an appropriate priority.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-grid">
+
+                    <label class="impact-card">
+
+                        <input
+                            type="radio"
+                            name="impact"
+                            value="LOW"
+                            required
+                        >
+
+                        <strong>Low</strong>
+
+                        <span>
+                            Minor inconvenience.
+                        </span>
+
+                    </label>
+
+
+                    <label class="impact-card">
+
+                        <input
+                            type="radio"
+                            name="impact"
+                            value="MEDIUM"
+                            required
+                        >
+
+                        <strong>Medium</strong>
+
+                        <span>
+                            Work or class is affected.
+                        </span>
+
+                    </label>
+
+
+                    <label class="impact-card">
+
+                        <input
+                            type="radio"
+                            name="impact"
+                            value="HIGH"
+                            required
+                        >
+
+                        <strong>High</strong>
+
+                        <span>
+                            Major disruption to normal activity.
+                        </span>
+
+                    </label>
+
+
+                    <label class="impact-card">
+
+                        <input
+                            type="radio"
+                            name="impact"
+                            value="CRITICAL"
+                            required
+                        >
+
+                        <strong>Critical</strong>
+
+                        <span>
+                            Multiple people or a major facility is affected.
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </section>
+
+
+            <!-- DESCRIPTION -->
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div>
+                        <span class="form-step">STEP 05</span>
+                        <h2>Tell us what happened.</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="title">
+                        Short title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        maxlength="120"
+                        required
+                        placeholder="Example: Wi-Fi unavailable in Lab 3"
+                    >
+
+                </div>
+
+
+                <div class="field-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="6"
+                        maxlength="1000"
+                        required
+                        placeholder="Describe what is happening, when you noticed it, and anything else that might help the support team."
+                    ></textarea>
+
+                    <div class="field-help">
+                        <span>
+                            Avoid sharing passwords or other sensitive information.
+                        </span>
+
+                        <span id="characterCount">
+                            0 / 1000
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- REVIEW -->
+
+            <section class="review-card">
+
+                <div class="review-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <h3>
+                        ResolveX will handle the routing.
+                    </h3>
+
+                    <p>
+                        Based on your category, location and impact,
+                        the system will suggest the responsible team
+                        and priority before creating the issue.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="btn btn-secondary"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Submit issue
+                    <span class="btn-arrow">→</span>
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

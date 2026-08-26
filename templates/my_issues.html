@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}My Issues — ResolveX{% endblock %}
+
+{% block content %}
+<section class="my-issues-page">
+    <div class="container my-issues-container">
+        <div class="my-issues-header">
+            <div>
+                <span class="section-kicker">REPORTER WORKSPACE</span>
+                <h1>My issues</h1>
+                <p>Follow every campus issue you have reported, from triage through resolution.</p>
+            </div>
+            <a class="btn btn-primary" href="{{ url_for('report_issue') }}">Report an issue <span class="btn-arrow">→</span></a>
+        </div>
+
+        <nav class="issue-filter-tabs" aria-label="Issue filters">
+            {% for value, label in [('all', 'All'), ('active', 'Active'), ('resolved', 'Resolved'), ('closed', 'Closed')] %}
+                <a class="{% if active_filter == value %}active{% endif %}" href="{{ url_for('my_issues', filter=value) }}">{{ label }}</a>
+            {% endfor %}
+        </nav>
+
+        {% if issues %}
+            <div class="reporter-issue-list">
+                {% for issue in issues %}
+                    <a class="reporter-issue-card" href="{{ url_for('issue_created', issue_id=issue.id) }}">
+                        <div class="reporter-issue-main">
+                            <div class="reporter-issue-topline">
+                                <span class="issue-id-label">RX-{{ "%04d"|format(issue.id) }}</span>
+                                <span class="reporter-issue-date">Updated {{ issue.updated_at }}</span>
+                            </div>
+                            <h2>{{ issue.title }}</h2>
+                            <p class="reporter-issue-category">{{ issue.category_name }}{% if issue.subcategory_name %} · {{ issue.subcategory_name }}{% endif %}</p>
+                            <p class="reporter-issue-location">{{ issue.building }}{% if issue.floor %} · {{ issue.floor }}{% endif %}{% if issue.room %} · {{ issue.room }}{% endif %}{% if issue.specific_area %} · {{ issue.specific_area }}{% endif %}</p>
+                        </div>
+                        <div class="reporter-issue-side">
+                            <span class="priority-badge priority-{{ issue.priority|lower }}">{{ issue.priority }}</span>
+                            <span class="issue-status status-{{ issue.status|lower }}">{{ issue.status|replace('_', ' ') }}</span>
+                            <span class="reporter-issue-open">Open details →</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="reporter-empty-state">
+                <span class="empty-state-mark">RX</span>
+                {% if active_filter == 'active' %}
+                    <h2>No active issues</h2>
+                    <p>You're all caught up.</p>
+                {% elif active_filter == 'resolved' %}
+                    <h2>No resolved issues</h2>
+                    <p>Resolved reports will appear here once work is complete.</p>
+                {% elif active_filter == 'closed' %}
+                    <h2>No closed issues</h2>
+                    <p>Issues you verify and close will appear here.</p>
+                {% else %}
+                    <h2>No issues yet</h2>
+                    <p>Your reported campus issues will appear here.</p>
+                {% endif %}
+                <a class="btn btn-primary" href="{{ url_for('report_issue') }}">Report an issue</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
