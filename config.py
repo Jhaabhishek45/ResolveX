@@ -4,7 +4,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-DATA_DIR = BASE_DIR / "data"
+# Vercel's deployed filesystem is read-only.
+# /tmp is writable but temporary, so use it only on Vercel.
+if os.environ.get("VERCEL"):
+    DATA_DIR = Path("/tmp/resolvex")
+else:
+    DATA_DIR = BASE_DIR / "data"
+
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 DATABASE_PATH = DATA_DIR / "campus.db"
