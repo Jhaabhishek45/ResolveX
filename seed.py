@@ -1,9 +1,7 @@
 from database import DatabaseManager
 
 
-# DatabaseManager is created by the application and passed into seed().
-# When seed.py is run directly, seed() creates its own database manager.
-db = None
+db = DatabaseManager()
 
 
 DEPARTMENTS = [
@@ -170,13 +168,11 @@ def seed_table(table, columns, rows):
                 "SELECT id FROM departments WHERE name = ?",
                 (row[0],),
             )
-
         elif table == "categories":
             existing = db.fetch_one(
                 "SELECT id FROM categories WHERE name = ?",
                 (row[0],),
             )
-
         elif table == "locations":
             existing = db.fetch_one(
                 """
@@ -188,7 +184,6 @@ def seed_table(table, columns, rows):
                 """,
                 row[:3],
             )
-
         else:
             raise ValueError(f"Unsupported table: {table}")
 
@@ -275,7 +270,6 @@ def seed_demo_issues():
         "SELECT id FROM users WHERE email = ?",
         ("abhishek@resolvex.local",),
     )
-
     technician = db.fetch_one(
         "SELECT id FROM users WHERE email = ?",
         ("technician@resolvex.local",),
@@ -360,7 +354,6 @@ def seed_demo_issues():
     ]
 
     for item in demo_issues:
-
         if db.fetch_one(
             "SELECT id FROM issues WHERE title = ?",
             (item["title"],),
@@ -371,7 +364,6 @@ def seed_demo_issues():
             "SELECT id FROM categories WHERE name = ?",
             (item["category"],),
         )
-
         subcategory = db.fetch_one(
             """
             SELECT id FROM subcategories
@@ -379,85 +371,39 @@ def seed_demo_issues():
             """,
             (category["id"], item["subcategory"]),
         )
-
         location = db.fetch_one(
             "SELECT id FROM locations WHERE building = ?",
             (item["building"],),
         )
-
         department = db.fetch_one(
             "SELECT id FROM departments WHERE name = ?",
             (triage_department(item["subcategory"]),),
         )
 
-        resolved_at = (
-            "datetime('now', '-1 days')"
-            if item.get("resolved")
-            else "NULL"
-        )
-
-        closed_at = (
-            "datetime('now', '-1 days')"
-            if item.get("resolved")
-            else "NULL"
-        )
-
-        assigned_to = (
-            technician["id"]
-            if item.get("assigned")
-            else None
-        )
-
+        resolved_at = "datetime('now', '-1 days')" if item.get("resolved") else "NULL"
+        closed_at = "datetime('now', '-1 days')" if item.get("resolved") else "NULL"
+        assigned_to = technician["id"] if item.get("assigned") else None
         issue_id = db.execute_insert(
             f"""
             INSERT INTO issues (
-                title,
-                description,
-                category_id,
-                subcategory_id,
-                location_id,
-                specific_area,
-                priority,
-                status,
-                department_id,
-                assigned_to,
-                reporter_id,
-                created_at,
-                updated_at,
-                due_at,
-                resolved_at,
-                closed_at
+                title, description, category_id, subcategory_id, location_id,
+                specific_area, priority, status, department_id, assigned_to,
+                reporter_id, created_at, updated_at, due_at, resolved_at, closed_at
             )
-            VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                datetime('now', ?),
-                datetime('now'),
-                datetime('now', ?),
-                {resolved_at},
-                {closed_at}
-            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    datetime('now', ?), datetime('now'),
+                    datetime('now', ?), {resolved_at}, {closed_at})
             """,
             (
-                item["title"],
-                item["description"],
-                category["id"],
-                subcategory["id"],
-                location["id"],
-                item["specific_area"],
-                item["priority"],
-                item["status"],
-                department["id"],
-                assigned_to,
-                reporter["id"],
-                item["offset"],
-                item["due"],
+                item["title"], item["description"], category["id"],
+                subcategory["id"], location["id"], item["specific_area"],
+                item["priority"], item["status"], department["id"],
+                assigned_to, reporter["id"], item["offset"], item["due"],
             ),
         )
-
         db.execute(
             """
-            INSERT INTO issue_history
-                (issue_id, user_id, action, note)
+            INSERT INTO issue_history (issue_id, user_id, action, note)
             VALUES (?, ?, ?, ?)
             """,
             (
@@ -482,17 +428,7 @@ def triage_department(subcategory):
     }[subcategory]
 
 
-def seed(database=None):
-    """
-    Seed ResolveX master data and demo records.
-
-    When called from app.py, use the existing DatabaseManager.
-    When run directly, create a new DatabaseManager.
-    """
-    global db
-
-    db = database or DatabaseManager()
-
+def seed():
     seed_table(
         "departments",
         "name, description",
