@@ -27,6 +27,15 @@ def create_app() -> Flask:
     # ---------------------------------------------------------
 
     database = DatabaseManager()
+
+    # Ensure the three demo accounts and required master data exist.
+    # Import locally to avoid changing the existing import/startup structure.
+    try:
+        from seed import seed
+        seed()
+    except Exception:
+        app.logger.exception("ResolveX demo data seeding failed during startup.")
+
     triage_engine = TriageEngine(database)
     analytics = AnalyticsService(database)
     assignment_manager = AssignmentManager(database)
@@ -670,41 +679,20 @@ def create_app() -> Flask:
                 issues.created_at,
                 issues.due_at,
                 issues.specific_area,
-
-                categories.name
-                    AS category_name,
-
-                subcategories.name
-                    AS subcategory_name,
-
+                categories.name AS category_name,
+                subcategories.name AS subcategory_name,
                 locations.building,
                 locations.floor,
                 locations.room,
                 locations.facility_type,
-
-                departments.name
-                    AS department_name,
-
-                users.name
-                    AS assignee_name
-
+                departments.name AS department_name,
+                users.name AS assignee_name
             FROM issues
-
-            JOIN categories
-                ON categories.id = issues.category_id
-
-            LEFT JOIN subcategories
-                ON subcategories.id = issues.subcategory_id
-
-            JOIN locations
-                ON locations.id = issues.location_id
-
-            LEFT JOIN departments
-                ON departments.id = issues.department_id
-
-            LEFT JOIN users
-                ON users.id = issues.assigned_to
-
+            JOIN categories ON categories.id = issues.category_id
+            LEFT JOIN subcategories ON subcategories.id = issues.subcategory_id
+            JOIN locations ON locations.id = issues.location_id
+            LEFT JOIN departments ON departments.id = issues.department_id
+            LEFT JOIN users ON users.id = issues.assigned_to
             WHERE issues.id = ?
             """,
             (issue_id,),
@@ -750,17 +738,11 @@ def create_app() -> Flask:
                 issue_history.action,
                 issue_history.note,
                 issue_history.timestamp,
-
-                users.name
-                    AS user_name
-
+                users.name AS user_name
             FROM issue_history
-
             LEFT JOIN users
                 ON users.id = issue_history.user_id
-
             WHERE issue_history.issue_id = ?
-
             ORDER BY
                 issue_history.timestamp ASC,
                 issue_history.id ASC
