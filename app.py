@@ -14,6 +14,7 @@ import secrets
 from config import APP_NAME, SECRET_KEY
 from database import DatabaseManager
 from services import AssignmentManager, AnalyticsService, TriageEngine
+from seed import seed
 
 
 def create_app() -> Flask:
@@ -27,6 +28,10 @@ def create_app() -> Flask:
     # ---------------------------------------------------------
 
     database = DatabaseManager()
+
+    # Seed ResolveX master data and demo accounts into the same database.
+    seed(database)
+
     triage_engine = TriageEngine(database)
     analytics = AnalyticsService(database)
     assignment_manager = AssignmentManager(database)
